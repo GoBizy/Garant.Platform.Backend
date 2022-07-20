@@ -1,4 +1,6 @@
-﻿using Garant.Platform.Models.Entities.Business;
+﻿using Garant.Platform.Models.Configurator.Output;
+using Garant.Platform.Models.Entities.Business;
+using System.Collections.Generic;
 
 namespace Garant.Platform.Models.Business.Output
 {
@@ -43,5 +45,11 @@ namespace Garant.Platform.Models.Business.Output
         /// Путь к изображению.
         /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// Сконвертированное поле InvestPrice.
+        /// </summary>
+        public List<ConvertInvestPriceIncludeOutput> InvestPriceOutput { get; set; }
+
     }
 }
