@@ -1,4 +1,6 @@
-﻿using Garant.Platform.Models.Entities.Franchise;
+﻿using Garant.Platform.Models.Configurator.Output;
+using Garant.Platform.Models.Entities.Franchise;
+using System.Collections.Generic;
 
 namespace Garant.Platform.Models.Franchise.Output
 {
@@ -35,5 +37,10 @@ namespace Garant.Platform.Models.Franchise.Output
         /// Полное ФИО создавшего франшизу.
         /// </summary>
         public string FullName { get; set; }
+
+        /// <summary>
+        /// Сконвертированное поле InvestInclude.
+        /// </summary>
+        public List<ConvertInvestPriceIncludeOutput> InvestIncludeOutput { get; set; }
     }
 }
