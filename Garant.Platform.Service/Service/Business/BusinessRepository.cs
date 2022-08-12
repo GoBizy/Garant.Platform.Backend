@@ -12,10 +12,12 @@ using Garant.Platform.Core.Logger;
 using Garant.Platform.Core.Utils;
 using Garant.Platform.Models.Business.Input;
 using Garant.Platform.Models.Business.Output;
+using Garant.Platform.Models.Configurator.Output;
 using Garant.Platform.Models.Entities.Business;
 using Garant.Platform.Models.Request.Output;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Garant.Platform.Services.Service.Business
 {
@@ -439,6 +441,7 @@ namespace Garant.Platform.Services.Service.Business
                                         Payback = b.Payback,
                                         Profitability = b.Profitability,
                                         InvestPrice = b.InvestPrice,
+                                        InvestPriceOutput = JsonConvert.DeserializeObject<List<ConvertInvestPriceIncludeOutput>>(b.InvestPrice),
                                         Text = b.Text,
                                         Share = b.Share,
                                         Site = b.Site,

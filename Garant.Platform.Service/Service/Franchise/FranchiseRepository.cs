@@ -10,12 +10,14 @@ using Garant.Platform.Core.Data;
 using Garant.Platform.Core.Exceptions;
 using Garant.Platform.Core.Logger;
 using Garant.Platform.Core.Utils;
+using Garant.Platform.Models.Configurator.Output;
 using Garant.Platform.Models.Entities.Franchise;
 using Garant.Platform.Models.Franchise.Input;
 using Garant.Platform.Models.Franchise.Output;
 using Garant.Platform.Models.Request.Output;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Garant.Platform.Services.Service.Franchise
 {
@@ -923,6 +925,7 @@ namespace Garant.Platform.Services.Service.Franchise
                             Payback = f.Payback,
                             LaunchDate = f.LaunchDate,
                             InvestInclude = f.InvestInclude,
+                            InvestIncludeOutput = JsonConvert.DeserializeObject<List<ConvertInvestPriceIncludeOutput>>(f.InvestInclude),
                             Peculiarity = f.Peculiarity,
                             PaymentDetail = f.PaymentDetail,
                             TrainingDetails = f.TrainingDetails,
