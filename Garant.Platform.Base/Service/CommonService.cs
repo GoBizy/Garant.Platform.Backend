@@ -14,6 +14,7 @@ using Garant.Platform.Core.Utils;
 using Garant.Platform.Mailings.Abstraction;
 using Garant.Platform.Models.Entities.User;
 using Garant.Platform.Models.Mailing.Output;
+using Garant.Platform.Models.User.Output;
 using Microsoft.EntityFrameworkCore;
 
 namespace Garant.Platform.Base.Service
@@ -95,6 +96,123 @@ namespace Garant.Platform.Base.Service
             {
                 Console.WriteLine(e);
 
+                var logger = new Logger(_postgreDbContext, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод создаст код сброса пароля, запишет его в базу данных и отправит пользователю.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <returns> Флаг успеха. </returns>
+        public async Task<MailngOutput> GenerateResetCodeAsync(string email)
+        {
+            try
+            {
+                var random = new Random();
+                string type = null;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    throw new EmptyTypeMailingException();
+                }
+
+                // Создаст код сброса пароля из 5 цифр.
+                var code = random.Next(10000, 99999).ToString("D4");
+
+                type = "mail";
+
+                // Запишет код сброса в базу или обновит его.
+                await SaveCodeAsync(email, code);
+
+                await _mailigSmsService.SendAcceptCodeMailAsync(code, email);
+
+                var result = new MailngOutput
+                {
+                    IsSuccessMailing = true,
+                    TypeMailing = type
+                };
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+
+                var logger = new Logger(_postgreDbContext, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод проверит соответствие полученного кода с кодом в базе данных и почтой.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <param name="code"> Полученный код. </param>
+        /// <returns> Флаг успеха. </returns>
+        public async Task<bool> CheckCodeAsync(string email, string code)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    throw new EmptyTypeMailingException();
+                }
+
+                var findedUser = await _postgreDbContext.Users
+                    .Where(b => b.Code.Equals(code))
+                    .Select(b => b)
+                    .FirstOrDefaultAsync();
+
+                return findedUser.Email == email;
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                var logger = new Logger(_postgreDbContext, e.GetType().FullName, e.Message, e.StackTrace);
+                await logger.LogCritical();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Метод изменит пароль пользователя.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <param name="password"> Новый пароль. </param>
+        /// <returns> Флаг успеха. </returns>
+        public async Task<bool> ChangePasswordAsync(string email, string password)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                {
+                    throw new EmptyTypeMailingException();
+                }
+
+                var passwordHash = await HashPasswordAsync(password);
+
+                var getUser = await (from u in _postgreDbContext.Users
+                                     where u.Email.Equals(email)
+                                     select u)
+                            .FirstOrDefaultAsync();
+
+                var oldPassword = getUser.UserPassword;
+
+                getUser.UserPassword = password;
+                getUser.PasswordHash = passwordHash;
+
+                await _postgreDbContext.SaveChangesAsync();
+
+                return oldPassword != getUser.UserPassword;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 var logger = new Logger(_postgreDbContext, e.GetType().FullName, e.Message, e.StackTrace);
                 await logger.LogCritical();
                 throw;
