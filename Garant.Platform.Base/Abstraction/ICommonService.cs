@@ -59,5 +59,28 @@ namespace Garant.Platform.Base.Abstraction
         /// <param name="str">Исходная строка с параметрами, которые конкантенированы.</param>
         /// <returns>Измененная строку по SHA-256.</returns>
         Task<string> HashSha256Async(Dictionary<string, object> hashValues);
+
+        /// <summary>
+        /// Метод создаст код сброса пароля, запишет его в базу данных и отправит пользователю.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <returns> Флаг успеха. </returns>
+        Task<MailngOutput> GenerateResetCodeAsync(string email);
+
+        /// <summary>
+        /// Метод проверит соответствие полученного кода с кодом в базе данных и почтой.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <param name="code"> Полученный код. </param>
+        /// <returns> Флаг успеха. </returns>
+        Task<bool> CheckCodeAsync(string email, string code);
+
+        /// <summary>
+        /// Метод изменит пароль пользователя.
+        /// </summary>
+        /// <param name="email"> Почта. </param>
+        /// <param name="password"> Новый пароль. </param>
+        /// <returns> Флаг успеха. </returns>
+        Task<bool> ChangePasswordAsync(string email, string password);
     }
 }
